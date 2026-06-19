@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chỉnh Ảnh Miễn Phí – Powered by Gemini</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+    text-align: left;
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .feature span { font-size: 20px; }
+
+  /* NÚT CHÍNH */
+  #mainBtn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: linear-gradient(135deg, #7c3aed, #3b82f6);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.5);
+  }
+
+  #mainBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.6); }
+  #mainBtn:active { transform: scale(0.98); }
+  #mainBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* OVERLAY */
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #overlay.show { display: flex; }
+
+  .overlay-box {
+    background: #1e1b4b;
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 20px;
+    padding: 40px 32px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .overlay-box .big-icon { font-size: 56px; margin-bottom: 16px; }
+
+  .overlay-box h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #a78bfa;
+  }
+
+  .overlay-box p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+  }
+
+  .step-num {
+    background: linear-gradient(135deg, #7c3aed, #3b82f6);
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .loading-dots {
+    display: inline-block;
+  }
+
+  .loading-dots span {
+    animation: blink 1.2s infinite;
+    font-size: 20px;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+
+  /* SAU KHI UNLOCK */
+  #unlockSection { display: none; }
+
+  #unlockBtn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(5,150,105,0.5);
+    transition: all 0.3s;
+  }
+
+  #unlockBtn:hover { transform: translateY(-2px); }
+
+  .badge {
+    display: inline-block;
+    background: rgba(167,139,250,0.15);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    color: #a78bfa;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <span class="icon">🎨</span>
+  <div class="badge">✨ Miễn phí 100%</div>
+  <h1>AI Chỉnh Ảnh Siêu Đỉnh</h1>
+  <p class="subtitle">Dùng sức mạnh Gemini AI để chỉnh sửa ảnh chuyên nghiệp chỉ bằng vài câu mô tả. Không cần cài app!</p>
+
+  <div class="features">
+    <div class="feature"><span>🖼️</span> Xóa nền, thêm hiệu ứng tự động</div>
+    <div class="feature"><span>✍️</span> Mô tả bằng tiếng Việt là xong</div>
+    <div class="feature"><span>⚡</span> Kết quả trong vài giây</div>
+    <div class="feature"><span>🔐</span> Dùng tài khoản Google của bạn</div>
+  </div>
+
+  <button id="mainBtn" onclick="activate()">🚀 Kích hoạt & Dùng ngay</button>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+  <div class="overlay-box">
+    <div class="big-icon">⏳</div>
+    <h2>Đang kích hoạt<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></h2>
+    <p>Để dùng tool miễn phí, bạn cần hoàn thành 1 bước nhỏ:</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>Tab Shopee vừa mở — hãy xem qua sản phẩm <strong>(không cần mua gì)</strong></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>Sau đó <strong>đóng tab Shopee</strong> và quay lại trang này</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>Bấm nút xanh để vào tool AI</div>
+      </div>
+    </div>
+
+    <div id="unlockSection">
+      <button id="unlockBtn" onclick="goToGemini()">✅ Tôi đã xong – Vào tool AI ngay!</button>
+    </div>
+
+    <div id="waitingMsg" style="color:rgba(255,255,255,0.5); font-size:13px;">
+      Đang chờ bạn hoàn thành bước trên...
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============ CẤU HÌNH ============
+  const SHOPEE_LINK = "https://shope.ee/LINK_CUA_MAY"; // 👈 THAY LINK SHOPEE VÀO ĐÂY
+  const GEMINI_LINK = "https://gemini.google.com/app";
+  const WAIT_TIME = 5000; // 5 giây sau khi mở Shopee thì hiện nút xanh
+  // ==================================
+
+  function activate() {
+    // Mở Shopee
+    window.open(SHOPEE_LINK, '_blank');
+
+    // Hiện overlay
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('mainBtn').disabled = true;
+
+    // Sau WAIT_TIME giây hiện nút unlock
+    setTimeout(() => {
+      document.getElementById('waitingMsg').style.display = 'none';
+      document.getElementById('unlockSection').style.display = 'block';
+    }, WAIT_TIME);
+  }
+
+  function goToGemini() {
+    window.location.href = GEMINI_LINK;
+  }
+</script>
+
+</body>
+</html>
